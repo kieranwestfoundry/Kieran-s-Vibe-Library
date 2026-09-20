@@ -11,7 +11,7 @@ Most of these were built to answer one specific question in one specific workflo
 kept because they turned out useful. Nodes that survive real work get hardened and moved
 to `vfx_pipeline_nodes`. Promotion is one way, ie fixes don't come back here.
 
-No support, no stability guarantees, and things move between commits.
+No support, no stability guarantees!
 
 ---
 
