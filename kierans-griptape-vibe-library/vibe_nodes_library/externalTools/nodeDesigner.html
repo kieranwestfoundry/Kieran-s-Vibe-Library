@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Griptape Node Customizer</title>
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-panel: #1e1e1e;
+            --bg-card: #252526;
+            --bg-input: #3c3c3c;
+            --text-main: #cccccc;
+            --text-muted: #888888;
+            --border: #333333;
+            --accent: #007acc;
+            
+            /* Griptape Theme Colors */
+            --theme-purple: #a855f7;
+            --theme-cyan: #06b6d4;
+            --theme-green: #22c55e;
+            --theme-red: #ef4444;
+            --theme-blue: #3b82f6;
+            --theme-orange: #f97316;
+            --theme-gray: #6b7280;
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { margin: 0; padding: 20px; background-color: var(--bg-dark); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; }
+        h2, h3 { margin-top: 0; color: #fff; }
+        
+        .header { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .error-badge { background: var(--theme-red); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; display: none; }
+        
+        .dashboard { display: flex; gap: 20px; flex: 1; min-height: 0; }
+        .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
+        
+        /* Form Controls */
+        .control-group { margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--text-muted); }
+        input[type="text"], select, textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: #fff; padding: 8px; border-radius: 4px; outline: none; }
+        input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--accent); }
+        
+        .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+        .checkbox-item input { margin: 0; cursor: pointer; }
+
+        /* JSON Editor */
+        #jsonEditor { flex: 1; font-family: monospace; font-size: 13px; resize: none; white-space: pre; }
+
+        /* Node Preview Canvas */
+        .canvas { background: #1a1a1a; flex: 1; border-radius: 6px; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; border: 1px dashed #444; position: relative; }
+        
+        .mock-category { align-self: flex-start; display: flex; align-items: center; gap: 8px; margin-bottom: 20px; padding: 8px 12px; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border); border-left: 4px solid var(--current-theme, var(--theme-purple)); }
+        
+        .mock-node { background: var(--bg-card); width: 300px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.3); overflow: hidden; transition: all 0.2s; }
+        .mock-node-header { padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+        .mock-node-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .badge { font-size: 10px; background: #444; padding: 2px 6px; border-radius: 12px; }
+        
+        /* Parameter Preview */
+        .mock-param { background: #1e1e1e; border: 1px solid #333; border-radius: 4px; padding: 10px; transition: all 0.2s; }
+        .mock-param-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; color: #aaa; }
+        .mock-input { background: #111; border: 1px solid #333; height: 28px; border-radius: 3px; display: flex; align-items: center; padding: 0 8px; color: #666; font-size: 12px; }
+        
+        /* Conditional Visuals */
+        .is-full-width { width: 100%; }
+        .not-full-width { width: auto; }
+        .is-expander { border-left: 2px solid var(--text-muted); }
+        .is-collapsed .mock-input { display: none; }
+        .is-multiline { height: 60px; align-items: flex-start; padding-top: 6px; }
+        
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 122, 204, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0, 122, 204, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 122, 204, 0); } }
+        .is-pulsing { animation: pulse 2s infinite; border-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>Griptape Node Customizer (Offline)</h2>
+        <div id="jsonError" class="error-badge">Invalid JSON</div>
+    </div>
+
+    <div class="dashboard">
+        <div class="panel">
+            <h3>Visual Controls</h3>
+            
+            <div class="control-group">
+                <label>Category Title</label>
+                <input type="text" id="catTitle" oninput="updateFromUI()">
+                <br><br>
+                <label>Category Theme Color</label>
+                <select id="catTheme" onchange="updateFromUI()">
+                    <option value="purple">Purple</option>
+                    <option value="cyan">Cyan</option>
+                    <option value="green">Green</option>
+                    <option value="blue">Blue</option>
+                    <option value="orange">Orange</option>
+                    <option value="red">Red</option>
+                    <option value="gray">Gray</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Node Display Name</label>
+                <input type="text" id="nodeName" oninput="updateFromUI()">
+                <br><br>
+                <label>Node Group (Badge)</label>
+                <input type="text" id="nodeGroup" oninput="updateFromUI()">
+            </div>
+
+            <div class="control-group" style="border-bottom: none;">
+                <label>Parameter UI Options</label>
+                <input type="text" id="paramName" placeholder="Parameter Name" style="margin-bottom: 10px;" oninput="updateFromUI()">
+                
+                <div class="checkbox-grid">
+                    <label class="checkbox-item"><input type="checkbox" id="uiFullWidth" onchange="updateFromUI()"> is_full_width</label>
+                    <label class="checkbox-item"><input type="checkbox" id="uiExpander" onchange="updateFromUI()"> expander</label>
+                    <label class="checkbox-item"><input type="checkbox" id="uiCollapsed" onchange="updateFromUI()"> collapsed</label>
+                    <label class="checkbox-item"><input type="checkbox" id="uiPulse" onchange="updateFromUI()"> pulse_on_run</label>
+                    <label class="checkbox-item"><input type="checkbox" id="uiMultiline" onchange="updateFromUI()"> multiline</label>
+                    <label class="checkbox-item"><input type="checkbox" id="uiFile" onchange="updateFromUI()"> clickable_file_browser</label>
+                    <label class="checkbox-item"><input type="checkbox" id="uiHideProp" onchange="updateFromUI()"> hide_property</label>
+                    <label class="checkbox-item" style="color: #ef4444;"><input type="checkbox" id="uiHide" onchange="updateFromUI()"> hide (invisible)</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" style="flex: 1.5;">
+            <h3>Live Preview</h3>
+            <div class="canvas" id="previewCanvas">
+                
+                <div class="mock-category" id="prevCategory">
+                    <span id="prevCatIcon">📁</span> 
+                    <strong id="prevCatTitle">Image</strong>
+                </div>
+
+                <div class="mock-node" id="prevNode">
+                    <div class="mock-node-header">
+                        <strong id="prevNodeName">Color Match</strong>
+                        <span class="badge" id="prevNodeGroup">edit</span>
+                    </div>
+                    <div class="mock-node-body">
+                        
+                        <div class="mock-param" id="prevParam">
+                            <div class="mock-param-header">
+                                <span id="prevParamName">target_image</span>
+                                <span id="prevParamPropBadge" class="badge" style="background: #ef4444; display: none;">Hidden in Props</span>
+                            </div>
+                            <div class="mock-input" id="prevInput">
+                                <span id="prevInputText">Input value...</span>
+                                <span id="prevFileIcon" style="margin-left: auto; display: none;">📎</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>Live Code Override</h3>
+            <label>Edit JSON to automatically update the UI and Preview</label>
+            <textarea id="jsonEditor" oninput="updateFromCode()"></textarea>
+        </div>
+    </div>
+
+    <script>
+        // Central State
+        let state = {
+            category: { title: "Image", theme: "purple" },
+            node: { display_name: "Color Match", group: "edit" },
+            parameter: {
+                name: "target_image",
+                ui_options: {
+                    is_full_width: false,
+                    expander: true,
+                    collapsed: false,
+                    pulse_on_run: false,
+                    multiline: false,
+                    clickable_file_browser: true,
+                    hide_property: false,
+                    hide: false
+                }
+            }
+        };
+
+        // DOM Elements - Forms
+        const els = {
+            catTitle: document.getElementById('catTitle'),
+            catTheme: document.getElementById('catTheme'),
+            nodeName: document.getElementById('nodeName'),
+            nodeGroup: document.getElementById('nodeGroup'),
+            paramName: document.getElementById('paramName'),
+            uiFullWidth: document.getElementById('uiFullWidth'),
+            uiExpander: document.getElementById('uiExpander'),
+            uiCollapsed: document.getElementById('uiCollapsed'),
+            uiPulse: document.getElementById('uiPulse'),
+            uiMultiline: document.getElementById('uiMultiline'),
+            uiFile: document.getElementById('uiFile'),
+            uiHideProp: document.getElementById('uiHideProp'),
+            uiHide: document.getElementById('uiHide'),
+            jsonEditor: document.getElementById('jsonEditor'),
+            jsonError: document.getElementById('jsonError'),
+            // Preview Elements
+            prevCategory: document.getElementById('prevCategory'),
+            prevCatTitle: document.getElementById('prevCatTitle'),
+            prevNode: document.getElementById('prevNode'),
+            prevNodeName: document.getElementById('prevNodeName'),
+            prevNodeGroup: document.getElementById('prevNodeGroup'),
+            prevParam: document.getElementById('prevParam'),
+            prevParamName: document.getElementById('prevParamName'),
+            prevInput: document.getElementById('prevInput'),
+            prevFileIcon: document.getElementById('prevFileIcon'),
+            prevParamPropBadge: document.getElementById('prevParamPropBadge')
+        };
+
+        // Initialize App
+        function init() {
+            syncStateToUI();
+            renderPreview();
+            syncStateToCode();
+        }
+
+        // Triggered when user changes the visual controls (Left Panel)
+        function updateFromUI() {
+            state.category.title = els.catTitle.value;
+            state.category.theme = els.catTheme.value;
+            state.node.display_name = els.nodeName.value;
+            state.node.group = els.nodeGroup.value;
+            state.parameter.name = els.paramName.value;
+            
+            state.parameter.ui_options = {
+                is_full_width: els.uiFullWidth.checked,
+                expander: els.uiExpander.checked,
+                collapsed: els.uiCollapsed.checked,
+                pulse_on_run: els.uiPulse.checked,
+                multiline: els.uiMultiline.checked,
+                clickable_file_browser: els.uiFile.checked,
+                hide_property: els.uiHideProp.checked,
+                hide: els.uiHide.checked
+            };
+
+            renderPreview();
+            syncStateToCode();
+        }
+
+        // Triggered when user edits the JSON text (Right Panel)
+        function updateFromCode() {
+            try {
+                const parsed = JSON.parse(els.jsonEditor.value);
+                state = parsed;
+                els.jsonError.style.display = 'none';
+                els.jsonEditor.style.borderColor = 'var(--border)';
+                
+                syncStateToUI();
+                renderPreview();
+            } catch (e) {
+                els.jsonError.style.display = 'block';
+                els.jsonEditor.style.borderColor = 'var(--theme-red)';
+            }
+        }
+
+        // Push state values into the visual HTML form controls
+        function syncStateToUI() {
+            els.catTitle.value = state.category.title || '';
+            els.catTheme.value = state.category.theme || 'purple';
+            els.nodeName.value = state.node.display_name || '';
+            els.nodeGroup.value = state.node.group || '';
+            els.paramName.value = state.parameter.name || '';
+            
+            const opts = state.parameter.ui_options || {};
+            els.uiFullWidth.checked = !!opts.is_full_width;
+            els.uiExpander.checked = !!opts.expander;
+            els.uiCollapsed.checked = !!opts.collapsed;
+            els.uiPulse.checked = !!opts.pulse_on_run;
+            els.uiMultiline.checked = !!opts.multiline;
+            els.uiFile.checked = !!opts.clickable_file_browser;
+            els.uiHideProp.checked = !!opts.hide_property;
+            els.uiHide.checked = !!opts.hide;
+            
+            // Disable collapsed if expander is false
+            els.uiCollapsed.disabled = !opts.expander;
+        }
+
+        // Push state JSON string into the text editor
+        function syncStateToCode() {
+            els.jsonEditor.value = JSON.stringify(state, null, 4);
+        }
+
+        // Update the visual representation in the center canvas
+        function renderPreview() {
+            // Category
+            els.prevCatTitle.textContent = state.category.title || 'Unnamed Category';
+            els.prevCategory.style.setProperty('--current-theme', `var(--theme-${state.category.theme || 'purple'})`);
+            
+            // Node
+            els.prevNodeName.textContent = state.node.display_name || 'Unnamed Node';
+            els.prevNodeGroup.textContent = state.node.group || '';
+            els.prevNodeGroup.style.display = state.node.group ? 'block' : 'none';
+            
+            // Parameter Hide Logic
+            const opts = state.parameter.ui_options || {};
+            if (opts.hide) {
+                els.prevParam.style.display = 'none';
+                return; // skip styling if hidden
+            } else {
+                els.prevParam.style.display = 'block';
+            }
+
+            els.prevParamName.textContent = state.parameter.name || 'parameter';
+            els.prevParamPropBadge.style.display = opts.hide_property ? 'block' : 'none';
+
+            // Parameter Styling Reset
+            els.prevParam.className = 'mock-param';
+            els.prevInput.className = 'mock-input';
+            
+            // Apply ui_options classes
+            if (opts.is_full_width) els.prevParam.classList.add('is-full-width');
+            if (opts.expander) els.prevParam.classList.add('is-expander');
+            if (opts.expander && opts.collapsed) els.prevParam.classList.add('is-collapsed');
+            if (opts.pulse_on_run) els.prevNode.classList.add('is-pulsing'); else els.prevNode.classList.remove('is-pulsing');
+            if (opts.multiline) els.prevInput.classList.add('is-multiline');
+            
+            els.prevFileIcon.style.display = opts.clickable_file_browser ? 'block' : 'none';
+        }
+
+        // Run on load
+        init();
+    </script>
+</body>
+</html>

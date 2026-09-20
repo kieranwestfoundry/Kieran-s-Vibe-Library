@@ -1,0 +1,466 @@
+{
+  "name": "kierans_vibe_library",
+  "library_schema_version": "0.6.0",
+  "settings": [
+    {
+      "description": "API keys required by nodes in this library",
+      "category": "app_events.on_app_initialization_complete",
+      "contents": {
+        "secrets_to_register": {
+          "OPENAI_API_KEY": "",
+          "ANTHROPIC_API_KEY": "",
+          "NUKE_BIN_PATH": "/Users/kieranwest/Documents/NukeNightlys/Nuke17.0v1/Nuke17.0v1.app/Contents/MacOS/Nuke17.0v1/Contents/MacOS/Nuke17.0"
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "author": "Kieran",
+    "description": "Strictly-Vibe-Coded Prototype Library.",
+    "library_version": "0.1.0",
+    "engine_version": "0.90.0",
+    "tags": ["Vibes", "AI", "Prototypes"],
+    "dependencies": {
+      "pip_dependencies": [
+        "griptape>=1.9.3",
+        "diffusers>=0.37.1",
+        "pillow>=12.2.0",
+        "tiktoken>=0.12.0",
+        "usd-core~=25.08",
+        "OpenEXR~=3.3.0",
+        "numpy~=1.26.0",
+        "opencv-python>=4.11.0",
+        "mmh3>=5.0.0",
+        "pi-heif",
+        "pillow-heif==1.3.0",
+        "chromadb",
+        "transformers",
+        "torch",
+        "torchaudio",
+        "huggingface_hub",
+        "static-ffmpeg>=2.8",
+        "python-docx",
+        "PyMuPDF",
+        "langchain-text-splitters"
+      ]
+    }
+  },
+  "widgets": [],
+  "categories": [
+    {
+      "misc": {
+        "title": "misc",
+        "description": "Miscellaneous vibe nodes",
+        "color": "border-gray-500",
+        "icon": "Folder"
+      }
+    },
+    {
+      "agents": {
+        "color": "border-purple-500",
+        "title": "Agent",
+        "description": "Nodes related to Agents",
+        "icon": "UserCircle"
+      }
+    },
+    {
+      "image": {
+        "color": "border-indigo-500",
+        "title": "Image",
+        "description": "Pixel pushing nodes",
+        "icon": "Image",
+        "group": "create"
+      }
+    },
+    {
+      "diffusion": {
+        "color": "border-sky-500",
+        "title": "Diffusion",
+        "description": "Multi-pass rendering and generation nodes",
+        "icon": "Sparkles",
+        "group": "create"
+      }
+    },
+    {
+      "langchain": {
+        "color": "border-emerald-500",
+        "title": "LangChain",
+        "description": "LangChain integration nodes and utilities",
+        "icon": "Link",
+        "group": "edit"
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "class_name": "OllamaPromptNode",
+      "file_path": "vibe_nodes_library/ollama/ollama.py",
+      "metadata": {
+        "category": "agents",
+        "description": "Creates an AI agent with conversation memory.",
+        "display_name": "Agent",
+        "group": "create"
+      }
+    },
+    {
+      "class_name": "TokenEstimatorNode",
+      "file_path": "vibe_nodes_library/tokenEstimator/tokenEstimator.py",
+      "metadata": {
+        "category": "agents",
+        "description": "Estimates token count for input text.",
+        "display_name": "Token Estimator",
+        "group": "create"
+      }
+    },
+    {
+      "class_name": "TokenBudgetNode",
+      "file_path": "vibe_nodes_library/tokenEstimator/tokenBudgetEstimator.py",
+      "metadata": {
+        "category": "agents",
+        "description": "Estimates token usage against model limits.",
+        "display_name": "Token Budget Estimator",
+        "group": "create"
+      }
+    },
+    {
+      "class_name": "PipelineKnowledgeBaseToolNode",
+      "file_path": "vibe_nodes_library/vectorStorageLookup/vectorLookup.py",
+      "metadata": {
+        "category": "cloud",
+        "description": "Queries the Griptape Cloud Vector Store for pipeline documentation.",
+        "display_name": "Pipeline Knowledge Base Tool",
+        "group": "create"
+      }
+    },
+    {
+      "class_name": "ArchetypePresetNode",
+      "file_path": "vibe_nodes_library/Archetype/archetype_preset.py",
+      "metadata": {
+        "category": "agents",
+        "description": "Creates an LLM archetype for managing conversation identitys.",
+        "display_name": "ArchetypePreset",
+        "group": "create"
+      }
+    },
+    {
+      "class_name": "NormalCrafterSharedMediaNode",
+      "file_path": "vibe_nodes_library/normalCrafter/normalcrafter.py",
+      "metadata": {
+        "category": "Plate Prep",
+        "description": "normal craft model.",
+        "display_name": "NormalCrafter",
+        "icon": "clapperboard",
+        "group": "edit"
+      }
+    },
+    {
+      "class_name": "NukeKronos",
+      "file_path": "vibe_nodes_library/nukeNode/nuke_node.py",
+      "metadata": {
+        "category": "Nuke",
+        "description": "Kronos in griptape?!?! sort of.",
+        "display_name": "Kronos",
+        "group": "Nuke"
+      }
+    },
+    {
+      "class_name": "NukeBokeh",
+      "file_path": "vibe_nodes_library/nukeNode/nuke_node.py",
+      "metadata": {
+        "category": "Nuke",
+        "description": "Bokeh in griptape?!?! sort of.",
+        "display_name": "Bokeh",
+        "group": "Nuke"
+      }
+    },
+    {
+      "class_name": "UsdNukeInspector",
+      "file_path": "vibe_nodes_library/usdTools/USD_Model_Inspector.py",
+      "metadata": {
+        "category": "TD Pipeline Tools",
+        "description": "USD model inspector for griptape, returns model information and metadata based on user queries.",
+        "display_name": "USD Model Inspector",
+        "group": "Pipeline Tools"
+      }
+    },
+    {
+      "class_name": "EXRToPNGConverter",
+      "file_path": "vibe_nodes_library/EXRtoPNG/EXRtoPNG.py",
+      "metadata": {
+        "category": "TD Pipeline Tools",
+        "description": "Converts EXR images to PNG and rescales to a maximum of 2K resolution.",
+        "display_name": "EXR to PNG Converter",
+        "group": "Pipeline Tools"
+      }
+    },
+    {
+      "class_name": "StringMultiplexer",
+      "file_path": "vibe_nodes_library/variableSwitch/variableSwitch.py",
+      "metadata": {
+        "category": "execution_flow",
+        "description": "Switches output based on different variable values.",
+        "display_name": "Variable Switch",
+        "group": "flow control"
+      }
+    },
+    {
+      "class_name": "ExtractFrame",
+      "file_path": "vibe_nodes_library/video/extractFrame.py",
+      "metadata": {
+        "category": "video",
+        "description": "Extracts a single frame from a video file.",
+        "display_name": "Extract Frame",
+        "group": "video"
+      }
+    },
+    {
+      "class_name": "ExtractFramesToGrid",
+      "file_path": "vibe_nodes_library/video/extractFrameToGrid.py",
+      "metadata": {
+        "category": "video",
+        "description": "Extracts frames from a video file and arranges them in a grid.",
+        "display_name": "Extract Frames to Grid",
+        "group": "video"
+      }
+    },
+    {
+      "class_name": "CryptomatteCompiler",
+      "file_path": "vibe_nodes_library/cryptomatteCompiler/cryptomatteCompiler.py",
+      "metadata": {
+        "category": "video",
+        "description": "Compiles binary mask videos into a VFX CY2025 compliant Cryptomatte EXR sequence.",
+        "display_name": "Cryptomatte Compiler",
+        "group": "video"
+      }
+    },
+    {
+      "class_name": "CreateJson",
+      "file_path": "vibe_nodes_library/json/createJson.py",
+      "metadata": {
+        "category": "json",
+        "description": "Creates a JSON array from provided items.",
+        "display_name": "Create JSON",
+        "group": "json"
+      }
+    },
+    {
+      "class_name": "MultiOutputUtilityNode",
+      "file_path": "vibe_nodes_library/utlity/MultiOutputUtilityNode.py",
+      "metadata": {
+        "category": "utility",
+        "description": "A utility node that generates multiple outputs.",
+        "display_name": "Multi-Output Utility",
+        "group": "utility"
+      }
+    },
+    {
+      "class_name": "ImageToBase64",
+      "file_path": "vibe_nodes_library/utlity/imageToBase64.py",
+      "metadata": {
+        "category": "utility",
+        "description": "Converts an image file to a Base64-encoded string.",
+        "display_name": "Image to Base64",
+        "group": "utility"
+      }
+    },
+    {
+      "class_name": "SafeTextLoader",
+      "file_path": "vibe_nodes_library/text/safe_text_loader.py",
+      "metadata": {
+        "category": "text",
+        "description": "Safely loads text from a file.",
+        "display_name": "Safe Text Loader",
+        "group": "text"
+      }
+    },
+    {
+      "class_name": "BaseModelConfig",
+      "file_path": "vibe_nodes_library/diffusion/BaseModelConfig/BaseModelConfig.py",
+      "metadata": {
+        "category": "diffusion",
+        "description": "Selects the base diffusion model for the generation pass.",
+        "display_name": "Base Model Config",
+        "icon": "Box",
+        "group": "diffusion"
+      }
+    },
+    {
+      "class_name": "LoraConfig",
+      "file_path": "vibe_nodes_library/diffusion/LoraConfig/LoraConfig.py",
+      "metadata": {
+        "category": "diffusion",
+        "description": "Outputs a generic dictionary config for a LoRA.",
+        "display_name": "LoRA Config",
+        "icon": "Sliders",
+        "group": "diffusion"
+      }
+    },
+    {
+      "class_name": "ControlNetConfig",
+      "file_path": "vibe_nodes_library/diffusion/ControlNetConfig/ControlNetConfig.py",
+      "metadata": {
+        "category": "diffusion",
+        "description": "Configures a ControlNet model and links it to a specific AOV pass.",
+        "display_name": "ControlNet Config",
+        "icon": "Layers",
+        "group": "diffusion"
+      }
+    },
+    {
+      "class_name": "MultiPassRenderNode",
+      "file_path": "vibe_nodes_library/diffusion/MultiPassRenderNode/MultiPassRenderNode.py",
+      "metadata": {
+        "category": "diffusion",
+        "description": "Ingests multiple render passes (AOVs) and configurations, sending them to an AI generation endpoint.",
+        "display_name": "Multi-Pass Render",
+        "icon": "Wand2",
+        "group": "diffusion"
+      }
+    },
+    {
+      "class_name": "RandomNumberGenerator",
+      "file_path": "vibe_nodes_library/number/RandomNumberGenerator/RandomNumberGenerator.py",
+      "metadata": {
+        "category": "number",
+        "description": "Anything can happen to anyone. It's just random.",
+        "display_name": "RandomNumberGenerator",
+        "icon": "random",
+        "group": "number"
+      }
+    },
+    {
+      "class_name": "LocalChromaDBToolNode",
+      "file_path": "vibe_nodes_library/ChromaDB/rag_node.py",
+      "metadata": {
+        "category": "chromaDB",
+        "description": "",
+        "display_name": "rag",
+        "icon": "data",
+        "group": "get"
+      }
+    },
+    {
+      "class_name": "LocalWhisperTranscriber",
+      "file_path": "vibe_nodes_library/audio/OllamaTranscriberAgent.py",
+      "metadata": {
+        "category": "audio",
+        "description": "",
+        "display_name": "Local Transcriber Agent",
+        "icon": "typewriter",
+        "group": "get"
+      }
+    },
+    {
+      "class_name": "ConstructControlNetNode",
+      "file_path": "vibe_nodes_library/diffusion/controlnet/construct_controlnet.py",
+      "metadata": {
+        "category": "diffusion",
+        "description": "Constructs a ControlNetModel to be fed into a Pipeline Builder.",
+        "display_name": "Construct ControlNet",
+        "icon": "Layers",
+        "group": "diffusion"
+      }
+    },
+    {
+      "class_name": "StableDiffusionControlNetBuilderNode",
+      "file_path": "vibe_nodes_library/diffusion/controlnet/controlnet_builder.py",
+      "metadata": {
+        "category": "diffusion",
+        "description": "Builds a Stable Diffusion pipeline with support for one or more ControlNets.",
+        "display_name": "SD ControlNet Builder",
+        "icon": "Wand2",
+        "group": "diffusion"
+      }
+    },
+    {
+      "class_name": "InjectSDControlNetNode",
+      "file_path": "vibe_nodes_library/diffusion/controlnet/inject_controlnet.py",
+      "metadata": {
+        "category": "diffusion",
+        "description": "Middleware node that injects ControlNet models into an existing Stable Diffusion Pipeline config before execution.",
+        "display_name": "Inject SD ControlNet",
+        "icon": "GitMerge",
+        "group": "diffusion"
+      }
+    },
+    {
+      "class_name": "FileManipulatorToolNode",
+      "file_path": "vibe_nodes_library/tools/FileManipulatorToolNode.py",
+      "metadata": {
+        "category": "agents",
+        "description": "Gives an agent the ability to manipulate files on disk (check dates, rename).",
+        "display_name": "File Manipulator Tool",
+        "icon": "FileCog",
+        "group": "tools"
+      }
+    },
+    {
+      "class_name": "UsdModelInspectorToolNode",
+      "file_path": "vibe_nodes_library/tools/UsdModelInspectorToolNode.py",
+      "metadata": {
+        "category": "agents",
+        "description": "Gives an agent the ability to render and visually inspect USD models via Nuke's headless USD renderer.",
+        "display_name": "USD Model Inspector Tool",
+        "icon": "Box",
+        "group": "tools"
+      }
+    },
+    {
+      "class_name": "PythonScriptRunnerNode",
+      "file_path": "vibe_nodes_library/PythonScriptRunnerNode/PythonScriptRunnerNode.py",
+      "metadata": {
+        "category": "utility",
+        "description": "Parses a Python script for argparse definitions and runs it with dynamically generated parameters.",
+        "display_name": "Python Script Runner",
+        "icon": "Terminal",
+        "group": "utility"
+      }
+    },
+    {
+      "class_name": "ProcessTextDocument",
+      "file_path": "vibe_nodes_library/text/text_cleaner.py",
+      "metadata": {
+        "category": "text",
+        "description": "Extracts and cleans text from PDF, DOCX, TXT, and MD files while preserving paragraph structure.",
+        "display_name": "Text Cleaner",
+        "group": "text"
+      }
+    },
+    {
+      "class_name": "RecursiveCharacterTextSplitterNode",
+      "file_path": "vibe_nodes_library/langchain/recursive_character_text_splitter.py",
+      "metadata": {
+        "category": "langchain",
+        "description": "Splits text into chunks using LangChain's RecursiveCharacterTextSplitter.",
+        "display_name": "Recursive Text Splitter",
+        "icon": "Scissors",
+        "group": "edit"
+      }
+    },
+    {
+      "class_name": "UUIDGeneratorNode",
+      "file_path": "vibe_nodes_library/utlity/UUIDGeneratorNode.py",
+      "metadata": {
+        "category": "utility",
+        "description": "UUIDGeneratorNode for Unique Ids!.",
+        "display_name": "UUID Generator",
+        "icon": "random",
+        "group": "utility"
+      }
+    },
+
+    {
+      "class_name": "AutoJsonTemplateFiller",
+      "file_path": "vibe_nodes_library/json/BatchJsonReplace.py",
+      "metadata": {
+        "category": "JSON",
+        "description": "json make good",
+        "display_name": "AutoJsonTemplateFiller",
+        "icon": "engine",
+        "group": "json"
+      }
+    }
+  ],
+  "workflows": [""],
+  "is_default_library": false
+}
