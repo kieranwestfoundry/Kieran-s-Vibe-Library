@@ -38,6 +38,29 @@ from video_probe import probe_video_dimensions, resolve_local_video_path, scale_
 
 logger = logging.getLogger("vibe_nodes_library.normalCrafter")
 
+# Diffusers eagerly runs `if is_xformers_available(): import xformers` inside
+# diffusers.models.attention_processor the moment ANY diffusers model class is first
+# imported in this process -- unconditionally, with no try/except of its own. In a
+# multi-library engine where several Griptape Nodes libraries' .venvs share sys.path,
+# xformers can resolve from one library's venv while the scipy/numpy it drags in
+# resolve from a different, incompatible one. Observed failure: xformers ->
+# xformers.checkpoint -> scipy.optimize -> scipy.sparse._sputils referencing the
+# long-removed `np.long`, raising AttributeError (not ImportError, so diffusers'
+# `import xformers` line doesn't catch it) and crashing the *first* diffusers import
+# this node makes -- nothing to do with anything this node does with xformers itself
+# (enable_xformers_memory_efficient_attention() below is already try/excepted).
+# Disabling diffusers' own xformers detection before that first import sidesteps it;
+# the pipeline runs fine without xformers, just without that memory/speed optimization.
+try:
+    import diffusers.utils.import_utils as _diffusers_import_utils
+
+    _diffusers_import_utils._xformers_available = False
+except Exception:  # noqa: BLE001
+    logger.warning(
+        "Could not pre-disable diffusers' xformers auto-detection; "
+        "a broken/cross-venv xformers install may crash the first diffusers import."
+    )
+
 # One loaded pipeline at a time, keyed by (unet_repo, base_svd_repo, cpu_offload).
 _PIPELINE_CACHE: dict[tuple[str, str, str], Any] = {}
 
