@@ -29,11 +29,25 @@ def resolve_local_video_path(video_artifact: Any) -> tuple[Path, bool]:
     Returns (path, is_temp) -- if is_temp is True, the caller is responsible
     for deleting the file once done with it.
     """
-    from griptape_nodes.files.file import File
-
     url = getattr(video_artifact, "value", video_artifact)
-    if isinstance(url, (str, os.PathLike)) and Path(url).exists():
+
+    # Path("") normalizes to Path(".") -- the current working directory -- which
+    # .exists() happily reports as True. An empty/blank url would silently resolve
+    # to the cwd and get handed to decord as a "video", which fails deep inside its
+    # C++ reader with an opaque "Is a directory" error instead of a clear one here.
+    if isinstance(url, (str, os.PathLike)) and not str(url).strip():
+        raise ValueError(
+            "input_video resolved to an empty path. The connected video artifact has "
+            "no url/value set -- check that a video is actually loaded upstream of "
+            "this node (not just an empty/unconnected video parameter)."
+        )
+
+    # is_file(), not exists(): exists() is also True for a directory, which decord
+    # will fail on just as unhelpfully as it does on an empty path.
+    if isinstance(url, (str, os.PathLike)) and Path(url).is_file():
         return Path(url), False
+
+    from griptape_nodes.files.file import File
 
     suffix = Path(str(url)).suffix or ".mp4"
     fd, temp_path_str = tempfile.mkstemp(suffix=suffix)
