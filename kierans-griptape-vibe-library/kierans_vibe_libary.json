@@ -19,7 +19,11 @@
     "description": "Strictly-Vibe-Coded Prototype Library.",
     "library_version": "0.1.0",
     "engine_version": "0.90.0",
-    "tags": ["Vibes", "AI", "Prototypes"],
+    "tags": [
+      "Vibes",
+      "AI",
+      "Prototypes"
+    ],
     "dependencies": {
       "pip_dependencies": [
         "griptape>=1.9.3",
@@ -41,7 +45,10 @@
         "static-ffmpeg>=2.8",
         "python-docx",
         "PyMuPDF",
-        "langchain-text-splitters"
+        "langchain-text-splitters",
+        "decord",
+        "mediapy",
+        "accelerate"
       ]
     }
   },
@@ -195,7 +202,7 @@
     },
     {
       "class_name": "StringMultiplexer",
-      "file_path": "vibe_nodes_library/variableSwitch/variableSwitch.py",
+      "file_path": "vibe_nodes_library/variableSwitch/VariableSwitch.py",
       "metadata": {
         "category": "execution_flow",
         "description": "Switches output based on different variable values.",
@@ -448,7 +455,6 @@
         "group": "utility"
       }
     },
-
     {
       "class_name": "AutoJsonTemplateFiller",
       "file_path": "vibe_nodes_library/json/BatchJsonReplace.py",
@@ -459,8 +465,21 @@
         "icon": "engine",
         "group": "json"
       }
+    },
+    {
+      "class_name": "NormalCrafterLocalNode",
+      "file_path": "vibe_nodes_library/normalCrafter/normal_crafter_local_node.py",
+      "metadata": {
+        "category": "Plate Prep",
+        "description": "Runs NormalCrafter locally in-process (vendored pipeline, no remote M1 server) and shows a live estimated-VRAM label based on the input video's resolution.",
+        "display_name": "NormalCrafter (Local)",
+        "icon": "clapperboard",
+        "group": "edit"
+      }
     }
   ],
-  "workflows": [""],
+  "workflows": [
+    ""
+  ],
   "is_default_library": false
 }
