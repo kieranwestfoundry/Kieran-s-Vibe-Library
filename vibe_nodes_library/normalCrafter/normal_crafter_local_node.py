@@ -61,6 +61,30 @@ except Exception:  # noqa: BLE001
         "a broken/cross-venv xformers install may crash the first diffusers import."
     )
 
+
+def _seed_everything(seed: int) -> None:
+    """Seed random/numpy/torch (+ CUDA) without importing diffusers.training_utils.
+
+    diffusers.training_utils.set_seed does the same three lines, but importing that
+    module drags in the whole diffusers.models tree (every UNet/Transformer variant,
+    plus eager peft/layerwise-casting integration in diffusers>=0.37). On this engine,
+    with several Griptape Nodes libraries' .venvs contributing to one sys.path, that
+    chain has already hit two different cross-venv version mismatches (xformers/scipy,
+    then transformers/torch flex_attention). Since all we need is seeding, skip the
+    import entirely rather than patch around each new mismatch as it surfaces.
+    """
+    import random
+
+    import numpy as np
+    import torch
+
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
 # One loaded pipeline at a time, keyed by (unet_repo, base_svd_repo, cpu_offload).
 _PIPELINE_CACHE: dict[tuple[str, str, str], Any] = {}
 
@@ -265,7 +289,6 @@ class NormalCrafterLocalNode(SuccessFailureNode):
     def _infer(self) -> None:
         import torch
         from _normalcrafter_pkg.utils import read_video_frames, save_video, vis_sequence_normal
-        from diffusers.training_utils import set_seed
 
         input_video = self.get_parameter_value("input_video")
         if input_video is None:
@@ -282,7 +305,7 @@ class NormalCrafterLocalNode(SuccessFailureNode):
         unet_repo = self.get_parameter_value("unet_repo") or "Yanrui95/NormalCrafter"
         base_svd_repo = self.get_parameter_value("base_svd_repo") or "stabilityai/stable-video-diffusion-img2vid-xt"
 
-        set_seed(seed)
+        _seed_everything(seed)
 
         pipe = self._get_pipeline(unet_repo, base_svd_repo, cpu_offload)
 
