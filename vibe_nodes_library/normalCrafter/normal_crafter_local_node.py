@@ -38,6 +38,23 @@ from video_probe import probe_video_dimensions, resolve_local_video_path, scale_
 
 logger = logging.getLogger("vibe_nodes_library.normalCrafter")
 
+# mediapy.write_video() shells out to the `ffmpeg` binary via shutil.which("ffmpeg"),
+# which only finds it if it's already on this process's PATH. `static-ffmpeg` is
+# declared as a pip dependency (it downloads/bundles a static ffmpeg binary) but
+# never puts it on PATH by itself -- that requires explicitly calling
+# static_ffmpeg.add_paths() at runtime. Without this, save_video() below fails with
+# "Program 'ffmpeg' is not found" even though static-ffmpeg is installed.
+# weak=True: don't override a real system ffmpeg if one's already on PATH.
+try:
+    import static_ffmpeg
+
+    static_ffmpeg.add_paths(weak=True)
+except Exception:  # noqa: BLE001
+    logger.warning(
+        "Could not add static-ffmpeg's bundled ffmpeg/ffprobe to PATH; "
+        "video saving will fail unless a system ffmpeg is already on PATH."
+    )
+
 # Diffusers eagerly runs `if is_xformers_available(): import xformers` inside
 # diffusers.models.attention_processor the moment ANY diffusers model class is first
 # imported in this process -- unconditionally, with no try/except of its own. In a
