@@ -8,8 +8,8 @@ Around 35 Griptape Nodes for AI-driven VFX work. Diffusion, Nuke integration, US
 pipeline tools, agents, RAG, and a pile of utilities.
 
 Most of these were built to answer one specific question in one specific workflow, then
-kept because they turned out useful. Nodes that survive real work get hardened and moved
-to `vfx_pipeline_nodes`. Promotion is one way, ie fixes don't come back here.
+kept because they turned out useful. Nodes that survive real work will eventually be hardened and moved
+to `vfx_pipeline_nodes`.
 
 No support, no stability guarantees!
 
